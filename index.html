@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Memos</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .config-panel {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .config-panel h3 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+        }
+
+        .btn-success {
+            background: #48bb78;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #38a169;
+        }
+
+        .btn-danger {
+            background: #f56565;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #e53e3e;
+        }
+
+        .notes-list {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .note-item {
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            transition: all 0.3s;
+        }
+
+        .note-item:hover {
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .note-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .note-title {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .note-meta {
+            display: flex;
+            gap: 10px;
+            font-size: 0.9em;
+            color: #718096;
+            margin-bottom: 10px;
+        }
+
+        .note-content {
+            color: #4a5568;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        .note-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 0.85em;
+            font-weight: 500;
+        }
+
+        .badge-todo {
+            background: #fef5e7;
+            color: #d68910;
+        }
+
+        .badge-study {
+            background: #ebf8ff;
+            color: #2c5282;
+        }
+
+        .badge-work {
+            background: #f0fff4;
+            color: #22543d;
+        }
+
+        .badge-life {
+            background: #fef2f2;
+            color: #742a2a;
+        }
+
+        .priority {
+            color: #f6ad55;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #718096;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 40px;
+            color: #a0aec0;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 30px;
+            border-radius: 10px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 {
+            color: #2d3748;
+        }
+
+        .close {
+            font-size: 28px;
+            cursor: pointer;
+            color: #a0aec0;
+        }
+
+        .close:hover {
+            color: #4a5568;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📝 DailyMemo</h1>
+            <p>每日笔记提醒工具</p>
+        </div>
+
+        <!-- API 配置 -->
+        <div class="config-panel">
+            <h3>🔐 身份验证</h3>
+            <div class="form-group">
+                <label>API Token（必填）</label>
+                <input type="password" id="apiToken" placeholder="请输入您的 API Token">
+            </div>
+            <button class="btn btn-primary" onclick="saveConfig()">开始使用</button>
+            <button class="btn btn-success" onclick="testPush()">测试推送</button>
+            <button class="btn btn-success" onclick="pushNow()">立即推送今日笔记</button>
+        </div>
+
+        <!-- 新增笔记 -->
+        <div class="config-panel">
+            <h3>➕ 新增笔记</h3>
+            <div class="form-group">
+                <label>标题</label>
+                <input type="text" id="newTitle" placeholder="输入笔记标题">
+            </div>
+            <div class="form-group">
+                <label>内容</label>
+                <textarea id="newContent" placeholder="输入笔记内容"></textarea>
+            </div>
+            <div class="form-group">
+                <label>分类</label>
+                <select id="newCategory">
+                    <option value="todo">待办事项</option>
+                    <option value="study">学习笔记</option>
+                    <option value="work">工作相关</option>
+                    <option value="life">生活杂记</option>
+                    <option value="other">其他</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>优先级</label>
+                <select id="newPriority">
+                    <option value="1">1 - 很低</option>
+                    <option value="2">2 - 较低</option>
+                    <option value="3" selected>3 - 中等</option>
+                    <option value="4">4 - 较高</option>
+                    <option value="5">5 - 很高</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>提醒方式</label>
+                <select id="newRemindType" onchange="toggleRemindType('new')">
+                    <option value="times">按时间点提醒</option>
+                    <option value="cron">按 Cron 表达式提醒</option>
+                </select>
+            </div>
+            <div class="form-group" id="newRemindTimesGroup">
+                <label>提醒时间（多个时间用逗号分隔，如：08:10, 12:30, 20:00）</label>
+                <input type="text" id="newRemindTimes" placeholder="08:10, 12:30, 20:00" value="08:10, 12:30, 20:00">
+                <small style="color: #718096;">默认：早上 08:10、中午 12:30、晚上 20:00</small>
+            </div>
+            <div class="form-group" id="newCronGroup" style="display: none;">
+                <label>Cron 表达式</label>
+                <input type="text" id="newCronExpression" placeholder="0 9 1 * *">
+                <small style="color: #718096;">
+                    格式：分钟 小时 日期 月份 星期<br>
+                    示例：<br>
+                    • 0 9 * * * - 每天 09:00<br>
+                    • 0 9 1 * * - 每月 1 号 09:00<br>
+                    • 0 9 * * 1 - 每周一 09:00<br>
+                    • */10 * * * * - 每 10 分钟
+                </small>
+            </div>
+            <button class="btn btn-primary" onclick="createNote()">创建笔记</button>
+        </div>
+
+        <!-- 笔记列表 -->
+        <div class="notes-list">
+            <h3>📚 我的笔记</h3>
+
+            <!-- 搜索和过滤 -->
+            <div class="config-panel" style="margin-bottom: 20px;">
+                <div class="form-group">
+                    <label>🔍 搜索笔记</label>
+                    <input type="text" id="searchKeyword" placeholder="搜索标题或内容..." oninput="searchNotes()">
+                </div>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <button class="btn btn-primary" onclick="showAllNotes()">显示全部</button>
+                    <button class="btn btn-success" onclick="showEnabledOnly()">仅显示启用提醒</button>
+                    <button class="btn btn-warning" onclick="showMergedOnly()">仅显示合并提醒</button>
+                </div>
+            </div>
+
+            <div id="notesList">
+                <div class="loading">加载中...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 编辑模态框 -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>编辑笔记</h2>
+                <span class="close" onclick="closeEditModal()">&times;</span>
+            </div>
+            <div class="form-group">
+                <label>标题</label>
+                <input type="text" id="editTitle">
+            </div>
+            <div class="form-group">
+                <label>内容</label>
+                <textarea id="editContent"></textarea>
+            </div>
+            <div class="form-group">
+                <label>分类</label>
+                <select id="editCategory">
+                    <option value="todo">待办事项</option>
+                    <option value="study">学习笔记</option>
+                    <option value="work">工作相关</option>
+                    <option value="life">生活杂记</option>
+                    <option value="other">其他</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>优先级</label>
+                <select id="editPriority">
+                    <option value="1">1 - 很低</option>
+                    <option value="2">2 - 较低</option>
+                    <option value="3">3 - 中等</option>
+                    <option value="4">4 - 较高</option>
+                    <option value="5">5 - 很高</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>提醒方式</label>
+                <select id="editRemindType" onchange="toggleRemindType('edit')">
+                    <option value="times">按时间点提醒</option>
+                    <option value="cron">按 Cron 表达式提醒</option>
+                </select>
+            </div>
+            <div class="form-group" id="editRemindTimesGroup">
+                <label>提醒时间（多个时间用逗号分隔）</label>
+                <input type="text" id="editRemindTimes" placeholder="08:10, 12:30, 20:00">
+                <small style="color: #718096;">格式：HH:MM，如：08:10, 12:30, 20:00</small>
+            </div>
+            <div class="form-group" id="editCronGroup" style="display: none;">
+                <label>Cron 表达式</label>
+                <input type="text" id="editCronExpression" placeholder="0 9 1 * *">
+                <small style="color: #718096;">
+                    格式：分钟 小时 日期 月份 星期<br>
+                    示例：0 9 1 * * - 每月 1 号 09:00
+                </small>
+            </div>
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" id="editEnableRemind"> 启用提醒
+                </label>
+            </div>
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" id="editMergeRemind"> 合并提醒
+                </label>
+            </div>
+            <button class="btn btn-primary" onclick="updateNote()">保存修改</button>
+        </div>
+    </div>
+
+    <script src="app_card.js?v=20260120"></script>
+</body>
+
+</html>
